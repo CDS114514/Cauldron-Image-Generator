@@ -12,6 +12,7 @@ HEIGHT = 64
 
 
 def bgra_to_signed_int(b, g, r, a):
+    """Convert BGRA color components to a signed 32-bit integer as used by Minecraft."""
     value = (b & 0xFF) | ((g & 0xFF) << 8) | ((r & 0xFF) << 16) | ((a & 0xFF) << 24)
     if value >= 0x80000000:
         value -= 0x100000000
@@ -21,21 +22,22 @@ def bgra_to_signed_int(b, g, r, a):
 def main():
 
     if not os.path.exists(INPUT_STRUCTURE):
-        print("找不到 mcstructure")
+        print("Error: cauldron.mcstructure not found.")
         return
 
     if not os.path.exists(INPUT_IMAGE):
-        print("找不到 image")
+        print("Error: image.png not found.")
         return
 
     img = Image.open(INPUT_IMAGE).convert("RGB")
 
     if img.size != (WIDTH, HEIGHT):
-        print("图片必须是64x64")
+        print("Error: Image must be 64x64 pixels.")
         return
 
     pixels = list(img.getdata())
 
+    # Read the template structure
     structure = pynbt.NBTFile(open(INPUT_STRUCTURE, "rb"), little_endian=True)
 
     block_data = structure["structure"]["palette"]["default"]["block_position_data"]
@@ -51,6 +53,7 @@ def main():
         x = i % WIDTH
         y = i // WIDTH
 
+        # Mirror horizontally because the structure coordinates are reversed
         mirror_x = WIDTH - 1 - x
 
         r, g, b = pixels[y * WIDTH + mirror_x]
@@ -61,7 +64,7 @@ def main():
 
     structure.save(open(OUTPUT_STRUCTURE, "wb"), little_endian=True)
 
-    print("完成:", OUTPUT_STRUCTURE)
+    print("Done:", OUTPUT_STRUCTURE)
 
 
 if __name__ == "__main__":
