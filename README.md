@@ -36,4 +36,3 @@ The script reads the input image, flips it horizontally (because the structure l
 - The original `cauldron.mcstructure` file is required as a template.
 - The generated structure is a single layer (Y=0) with dimensions 64×64.
 
----
